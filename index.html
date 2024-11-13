@@ -30,9 +30,9 @@ const canvas = document.getElementById('spiralCanvas');
 const ctx = canvas.getContext('2d');
 let scale = 0.1;
 let sequenceType = 'lucas';  // Set 'fibonacci' or 'lucas'
-let baseNumberCount = 2000;   // Initial number count, will increase as we zoom out
+let baseNumberCount = 5000;   // Initial number count, will increase as we zoom out
 let sequence = [];
-let zoomThreshold = 0.1;     // Define how much zoom affects sequence length
+let zoomThreshold = 0.01;     // Define how much zoom affects sequence length
 let lastZoomLevel = scale;
 
 // High-resolution canvas setup for sharp rendering
@@ -84,10 +84,10 @@ function drawSpiral() {
 
     // Draw center name
     ctx.save();
-    ctx.font = "bold 10px Arial";
+    ctx.font = "bold 15px Arial";
     ctx.fillStyle = "#fff";
     ctx.textAlign = "center";
-    ctx.fillText("¡Así te extraño, Alu!", 0, -20);
+    ctx.fillText("¡Así te extraño, Alu!", 0, -15);
     ctx.restore();
 
     // Draw the spiral of numbers
@@ -100,7 +100,7 @@ function drawSpiral() {
 
         ctx.save();
         ctx.translate(x, y);
-        ctx.rotate(angle + Math.PI / 4);
+        ctx.rotate(angle + Math.PI / 10);
         ctx.fillText(number, 0, 0);
         ctx.restore();
 

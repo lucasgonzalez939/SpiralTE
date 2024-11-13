@@ -17,7 +17,7 @@
     #spiralCanvas {
         width: 100vw;
         height: 100vh;
-        background-color: #5700bb;
+        background-color: #5B00E5;
     }
 </style>
 </head>
@@ -85,14 +85,14 @@ function drawSpiral() {
     // Draw center name
     ctx.save();
     ctx.font = "bold 15px Arial";
-    ctx.fillStyle = "#fff";
+    ctx.fillStyle = "#E6DE00";
     ctx.textAlign = "center";
     ctx.fillText("¡Así te extraño, Alu!", 0, -15);
     ctx.restore();
 
     // Draw the spiral of numbers
     ctx.font = "bold 10px Arial";
-    ctx.fillStyle = "#fff";
+    ctx.fillStyle = "#918D30";
     for (let i = 0; i < sequence.length; i++) {
         const number = sequence[i];
         const x = radius * Math.cos(angle);

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dynamic Spiral of Numbers</title>
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f3f3f3;
+        margin: 0;
+        overflow: hidden;
+    }
+    #spiralCanvas {
+        width: 100vw;
+        height: 100vh;
+        background-color: #7700ff;
+    }
+</style>
+</head>
+<body>
+
+<canvas id="spiralCanvas"></canvas>
+
+<script>
+const canvas = document.getElementById('spiralCanvas');
+const ctx = canvas.getContext('2d');
+let scale = 0.1;
+let sequenceType = 'lucas';  // Set 'fibonacci' or 'lucas'
+let baseNumberCount = 1000;   // Initial number count, will increase as we zoom out
+let sequence = [];
+let zoomThreshold = 0.1;     // Define how much zoom affects sequence length
+let lastZoomLevel = scale;
+
+// High-resolution canvas setup for sharp rendering
+function resizeCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
+    ctx.scale(dpr, dpr);
+    drawSpiral();
+}
+
+// Generate the Fibonacci or Lucas sequence up to `n` numbers
+function generateSequence(count) {
+    if (sequenceType === 'fibonacci') {
+        sequence = [0, 1];
+        for (let i = 2; i < count; i++) {
+            sequence.push(sequence[i - 1] + sequence[i - 2]);
+        }
+    } else if (sequenceType === 'lucas') {
+        sequence = [2, 1];
+        for (let i = 2; i < count; i++) {
+            sequence.push(sequence[i - 1] + sequence[i - 2]);
+        }
+    }
+}
+
+// Dynamically update sequence based on zoom level
+function updateSequence() {
+    const additionalNumbers = Math.floor((1 - scale) * baseNumberCount);
+    const targetCount = baseNumberCount + additionalNumbers;
+
+    if (sequence.length < targetCount) {
+        generateSequence(targetCount);
+    } else if (sequence.length > targetCount) {
+        sequence = sequence.slice(0, targetCount);  // Trim sequence if zooming in
+    }
+}
+
+// Draw the spiral
+function drawSpiral() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.translate(canvas.width / (2 * window.devicePixelRatio), canvas.height / (2 * window.devicePixelRatio));
+    ctx.scale(scale, scale);
+
+    let angle = 0;
+    let radiusIncrement = 16;
+    let radius = 0;
+
+    // Draw center name
+    ctx.save();
+    ctx.font = "bold 5px Arial";
+    ctx.fillStyle = "#fff";
+    ctx.textAlign = "center";
+    ctx.fillText("¡Así te extraño, Alu!", 0, -20);
+    ctx.restore();
+
+    // Draw the spiral of numbers
+    ctx.font = "bold 20px Arial";
+    ctx.fillStyle = "#fff";
+    for (let i = 0; i < sequence.length; i++) {
+        const number = sequence[i];
+        const x = radius * Math.cos(angle);
+        const y = radius * Math.sin(angle);
+
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle + Math.PI / 3);
+        ctx.fillText(number, 0, 0);
+        ctx.restore();
+
+        angle += Math.PI / 50;
+        radius += radiusIncrement;
+    }
+
+    ctx.restore();
+}
+
+// Zoom handling
+function zoom(delta) {
+    scale = Math.max(0.1, scale + delta);
+
+    // Adjust sequence length only if zoom level has changed significantly
+    if (Math.abs(scale - lastZoomLevel) > zoomThreshold) {
+        updateSequence();
+        lastZoomLevel = scale;
+    }
+    drawSpiral();
+}
+
+// Event listeners for zooming with scroll and pinch
+canvas.addEventListener('wheel', (event) => {
+    event.preventDefault();
+    zoom(event.deltaY < 0 ? 0.1 : -0.1);
+});
+
+canvas.addEventListener('touchstart', (event) => {
+    if (event.touches.length === 2) {
+        event.preventDefault();
+        lastTouchDistance = getTouchDistance(event.touches);
+    }
+});
+
+canvas.addEventListener('touchmove', (event) => {
+    if (event.touches.length === 2) {
+        event.preventDefault();
+        const newTouchDistance = getTouchDistance(event.touches);
+        const delta = (newTouchDistance - lastTouchDistance) * 0.005;
+        zoom(delta);
+        lastTouchDistance = newTouchDistance;
+    }
+});
+
+function getTouchDistance(touches) {
+    const dx = touches[0].clientX - touches[1].clientX;
+    const dy = touches[0].clientY - touches[1].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+// Initialize
+generateSequence(baseNumberCount);
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+</script>
+
+</body>
+</html>
